@@ -1,110 +1,126 @@
-# F5-TTS-Vietnamese
-![F5-TTS Architecture](tests/f5-tts.png)
+# F5-TTS Vietnamese Custom Web UI
 
-A fine-tuning pipeline for training a Vietnamese speech synthesis model using the F5-TTS architecture.
+Giao diện HTML + FastAPI để chạy model custom (ViVoice), cắt `gen_text` theo xuống dòng, chèn khoảng nghỉ giữa các chunk, xem audio/phổ âm và tải WAV.
 
-Try demo at: https://huggingface.co/spaces/hynt/F5-TTS-Vietnamese-100h
+Hỗ trợ:
 
-## Tips for training
-- 100 hours of data is generally sufficient to train a Vietnamese Text-to-Speech model for specific voices. However, to achieve optimal performance in voice cloning across a wide range of speakers, a larger dataset is recommended. I fine-tuned an F5-TTS model on approximately 1000 hours of data, which resulted in excellent voice cloning performance.
-- Having a large amount of speaker hours with highly accurate transcriptions is crucial — the more, the better. This helps the model generalize better to unseen speakers, resulting in lower WER after training and reducing hallucinations.
+- **macOS** (MPS/CPU) — Python 3.10/3.11
+- **Windows** — **Python 3.10 + CUDA** (khuyến nghị)
 
-## Tips for inference
-- It is recommended to select sample audios that are clear and have minimal interruptions, and should be less than 10 seconds long, as this will improve the synthesis results.
-- If the reference audio text is not provided, the default model used will be whisper-large-v3-turbo. Consequently, Vietnamese may not be accurately recognized in some cases, which can result in poor speech synthesis quality.
-- In case you want to synthesize speech from a long text paragraph, it is recommended to replace the chunks function (located in **src/f5_tts/infer/utils_infer.py**) with the modified chunk_text function below:
+## Yêu cầu chung
 
-```bash
-def chunk_text(text, max_chars=135):
-    sentences = [s.strip() for s in text.split('. ') if s.strip()]
-    i = 0
-    while i < len(sentences):
-        if len(sentences[i].split()) < 4:
-            if i == 0:
-                # Merge with the next sentence
-                sentences[i + 1] = sentences[i] + ', ' + sentences[i + 1]
-                del sentences[i]
-            else:
-                # Merge with the previous sentence
-                sentences[i - 1] = sentences[i - 1] + ', ' + sentences[i]
-                del sentences[i]
-                i -= 1
-        else:
-            i += 1
+- `ffmpeg` trong PATH ([Windows build](https://www.gyan.dev/ffmpeg/builds/) hoặc `winget install ffmpeg`)
+- Checkpoint đặt trong `model/` (ví dụ `model/F5-TTS-Vietnamese-ViVoice/`)
+- Model: [hynt/F5-TTS-Vietnamese-ViVoice](https://huggingface.co/hynt/F5-TTS-Vietnamese-ViVoice)
 
-    final_sentences = []
-    for sentence in sentences:
-        parts = [p.strip() for p in sentence.split(', ')]
-        buffer = []
-        for part in parts:
-            buffer.append(part)
-            total_words = sum(len(p.split()) for p in buffer)
-            if total_words > 20:
-                # Split into separate chunks
-                long_part = ', '.join(buffer)
-                final_sentences.append(long_part)
-                buffer = []
-        if buffer:
-            final_sentences.append(', '.join(buffer))
+## Windows (Python 3.10 + CUDA) — nhanh
 
-    if len(final_sentences[-1].split()) < 4 and len(final_sentences) >= 2:
-        final_sentences[-2] = final_sentences[-2] + ", " + final_sentences[-1]
-        final_sentences = final_sentences[0:-1]
+Trong **Command Prompt** / PowerShell tại thư mục gốc repo:
 
-    return final_sentences
+```bat
+web\setup_windows.bat
+web\start_windows.bat
 ```
 
-## Installation
+`setup_windows.bat` sẽ:
 
-### Create a separate environment if needed
+1. Tạo `.venv`
+2. Cài **PyTorch CUDA** (`cu124` mặc định, hoặc `121` / `cpu`)
+3. `pip install -e .` + deps web
+4. Tải ViVoice vào `model/`
 
-```bash
-# Create a python 3.10 conda env (you could also use virtualenv)
-conda create -n f5-tts python=3.10
-conda activate f5-tts
+Mở: http://127.0.0.1:7860
+
+### Setup Windows thủ công
+
+```bat
+cd path\to\f5-tts
+py -3.10 -m venv .venv
+.venv\Scripts\activate
+
+python -m pip install -U pip setuptools wheel
+
+REM CUDA 12.4 (đổi cu121 nếu driver cũ hơn)
+pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu124
+
+pip install -e .
+pip install -r web\requirements.txt
+python web\download_model.py
+
+set F5TTS_DEVICE=cuda:0
+python main.py
+REM hoặc: .venv\Scripts\python.exe main.py
 ```
 
-### Install PyTorch
 
-> ```bash
-> # Install pytorch with your CUDA version, e.g.
-> pip install torch==2.4.0+cu124 torchaudio==2.4.0+cu124 --extra-index-url https://download.pytorch.org/whl/cu124
-> ```
 
-### Install f5-tts module:
+Kiểm tra CUDA:
 
-> ```bash
-> cd F5-TTS-Vietnamese
-> pip install -e .
-> ```
-
-### Install sox, ffmpeg
-
-> ```bash
-> sudo apt-get update
-> sudo apt-get install sox ffmpeg
-> ```
-
-## Fine-tuning pipline
-
-Steps:
-
-- Prepare `audio_name` and corresponding transcriptions  
-- Add missing vocabulary from your dataset to the pretrained model  
-- Expand the model's embedding to support the updated vocabulary  
-- Perform feature extraction  
-- Fine-tune the model
-
-```bash
-bash fine_tuning.sh
+```bat
+python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0) if torch.cuda.is_available() else None)"
 ```
 
-### Inference
+Nếu `cuda=False` dù có GPU: đang cài nhầm bản CPU — gỡ rồi cài lại bằng `--index-url` CUDA ở trên.
+
+## macOS / Linux
 
 ```bash
-bash infer.sh
+cd /path/to/f5-tts
+python3.10 -m venv .venv   # hoặc python3.11
+source .venv/bin/activate
+python -m pip install -U pip setuptools wheel
+pip install torch torchaudio
+pip install -e .
+pip install -r web/requirements.txt
+python web/download_model.py
+
+# Chạy — không cần activate .venv
+python main.py
 ```
 
-### References
+`main.py` sẽ:
 
-- Original F5-TTS repository: [https://github.com/SWivid/F5-TTS](https://github.com/SWivid/F5-TTS)
+1. Đọc file `.env` ở root (nếu có)
+2. Tự chuyển sang Python trong `.venv` (không cần `activate`)
+
+Tạo config nhanh: `cp .env.example .env`
+
+## Biến môi trường
+
+Có thể set trong shell **hoặc** trong `.env`:
+
+| Biến | Ý nghĩa | Ví dụ |
+|------|---------|--------|
+| `F5TTS_DEVICE` | Ép device | `cuda:0`, `cpu`, `mps` |
+| `F5TTS_CUDA_INDEX` | GPU index nếu không set DEVICE | `0` |
+| `F5TTS_HOST` | Bind host | `127.0.0.1` hoặc `0.0.0.0` |
+| `F5TTS_PORT` | Port | `7860` |
+
+Trên Windows script start mặc định `F5TTS_DEVICE=cuda:0`.
+
+
+## Cách dùng UI
+
+1. Đặt checkpoint/vocab vào `model/` → UI tự quét thành **select**
+2. **Run Service** → load model (CUDA/MPS/CPU tự nhận)
+3. Upload ref audio + ref text (+ có thể **Lưu mẫu** vào localStorage để tái sử dụng)
+4. Nhập `gen_text` (mỗi dòng = 1 chunk)
+5. Chỉnh speed / nghỉ / NFE → **Synthesize** → nghe + phổ âm + tải WAV
+
+
+## API
+
+- `GET /api/status` — có thêm `device_info` (GPU name, CUDA version, platform)
+- `GET /api/models` — liệt kê ckpt/vocab trong `model/`
+- `POST /api/service/start`
+- `POST /api/service/stop`
+- `POST /api/infer`
+
+Output: `web/outputs/`
+
+## Ghi chú Windows + CUDA
+
+- Luôn chạy với `--workers 1` (tránh load model CUDA nhiều process)
+- Path trong select dùng dạng `model/...` (posix) — server chấp nhận cả `\` và `/`
+- Cần driver NVIDIA tương thích bản CUDA của PyTorch wheel
+- Nếu OOM: giảm `nfe_step`, rút ngắn ref audio, hoặc `set F5TTS_DEVICE=cpu`
