@@ -5,7 +5,7 @@
 /preprocess
 .venv/
 F5-TTS-Vietnamese-ViVoice/
-model/
+/model/
 web/outputs/
 .pip-tmp/
 .cache/
