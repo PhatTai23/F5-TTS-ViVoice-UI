@@ -1,0 +1,16 @@
+/data/your_dataset/
+/data/your_training_dataset/
+/data/your_training_dataset_non_preprocessed/
+/ckpts/your_training_dataset/
+/preprocess
+.venv/
+F5-TTS-Vietnamese-ViVoice/
+model/
+web/outputs/
+.pip-tmp/
+.cache/
+.env
+
+__pycache__/
+*.pyc
+.DS_Store

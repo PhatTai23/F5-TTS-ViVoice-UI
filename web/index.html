@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>F5-TTS Vietnamese Custom</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --panel-2: #243044;
+      --border: #334155;
+      --text: #e8eef7;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --danger: #f87171;
+      --warn: #fbbf24;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1e3a5f 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #134e4a 0%, transparent 45%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.7rem;
+      letter-spacing: 0.2px;
+    }
+
+    .sub {
+      color: var(--muted);
+      margin-bottom: 22px;
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: color-mix(in srgb, var(--panel) 92%, black);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 10px 0 6px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .row3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 700px) {
+
+      .row,
+      .row3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #082f49;
+    }
+
+    .btn-ok {
+      background: var(--accent-2);
+      color: #052e16;
+    }
+
+    .btn-danger {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #64748b;
+      flex: 0 0 auto;
+    }
+
+    .dot.on {
+      background: var(--accent-2);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+    }
+
+    .dot.busy {
+      background: var(--warn);
+    }
+
+    .dot.err {
+      background: var(--danger);
+    }
+
+    .log {
+      margin-top: 10px;
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      min-height: 72px;
+      max-height: 160px;
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.8rem;
+      white-space: pre-wrap;
+      color: #cbd5e1;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .out-audio {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .spec {
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #000;
+      display: none;
+    }
+
+    .meta {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .progress-bar {
+      margin-top: 10px;
+      height: 8px;
+      background: #0b1220;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .progress-bar>span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.25s ease;
+    }
+
+    .preset-box {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px dashed var(--border);
+      background: color-mix(in srgb, var(--panel-2) 70%, transparent);
+    }
+
+    .preset-box h3 {
+      margin: 0 0 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .preset-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .preset-actions button {
+      padding: 8px 12px;
+      font-size: 0.88rem;
+    }
+
+    .preset-preview {
+      width: 100%;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .preset-meta {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>F5-TTS Vietnamese Custom</h1>
+    <p class="sub">Chạy model custom (ViVoice) — mỗi dòng gen_text là một chunk, nối lại có khoảng nghỉ.</p>
+
+    <div class="grid">
+      <div>
+        <section class="card">
+          <h2>Service</h2>
+          <div class="row">
+            <div>
+              <label>Model</label>
+              <input id="model_name" type="text" value="F5TTS_Base" />
+            </div>
+            <div>
+              <label>Vocoder</label>
+              <select id="vocoder_name">
+                <option value="vocos" selected>vocos</option>
+                <option value="bigvgan">bigvgan</option>
+              </select>
+            </div>
+          </div>
+          <label>ckpt_file <span class="hint" style="display:inline">(quét từ model/)</span></label>
+          <select id="ckpt_file"></select>
+          <label>vocab_file <span class="hint" style="display:inline">(quét từ model/)</span></label>
+          <select id="vocab_file"></select>
+          <p class="hint" id="modelScanHint">Đặt checkpoint/vocab vào thư mục <code>model/</code> rồi bấm quét lại.</p>
+          <div class="actions">
+            <button class="btn-ok" id="btnStart" type="button">Run Service</button>
+            <button class="btn-danger" id="btnStop" type="button">Stop</button>
+            <button class="btn-ghost" id="btnScanModels" type="button">Quét model/</button>
+            <button class="btn-ghost" id="btnRefresh" type="button">Refresh status</button>
+          </div>
+          <div class="status">
+            <span class="dot" id="statusDot"></span>
+            <span id="statusText">Chưa chạy service</span>
+          </div>
+          <div class="log" id="log"></div>
+        </section>
+
+        <section class="card" style="margin-top:16px">
+          <h2>Inference</h2>
+          <label>Reference audio</label>
+          <input id="ref_audio" type="file" accept="audio/*,.wav,.mp3,.flac,.m4a" />
+          <label>Reference text (để trống = Whisper ASR)</label>
+          <input id="ref_text" type="text" placeholder="cả hai bên hãy cố gắng hiểu cho nhau" />
+
+          <div class="preset-box">
+            <h3>Mẫu reference</h3>
+            <label>Chọn mẫu đã lưu</label>
+            <select id="ref_preset"></select>
+            <audio id="ref_preset_preview" class="preset-preview" controls></audio>
+            <div class="preset-meta" id="ref_preset_meta"></div>
+            <label>Tên mẫu mới</label>
+            <input id="ref_preset_name" type="text" placeholder="VD: Giọng nam 1" />
+            <div class="preset-actions">
+              <button class="btn-ok" id="btnSavePreset" type="button">Lưu mẫu hiện tại</button>
+              <button class="btn-ghost" id="btnApplyPreset" type="button">Dùng mẫu</button>
+              <button class="btn-danger" id="btnDeletePreset" type="button">Xóa mẫu</button>
+            </div>
+            <p class="hint">Lưu reference audio + text vào trình duyệt để tái sử dụng. File lớn có thể vượt hạn mức
+              localStorage (~5MB).</p>
+          </div>
+
+          <label>Text to generate (mỗi dòng = 1 đợt gen)</label>
+          <textarea id="gen_text" placeholder="dòng 1...
+dòng 2...
+dòng 3..."></textarea>
+          <p class="hint">Xuống dòng để cắt chunk. Dòng trống sẽ bị bỏ.</p>
+
+          <div class="row3">
+            <div>
+              <label>Speed</label>
+              <input id="speed" type="number" min="0.3" max="2" step="0.1" value="1.0" />
+            </div>
+            <div>
+              <label>Tốc độ nghỉ (giây)</label>
+              <input id="pause_sec" type="number" min="0" max="5" step="0.05" value="0.3" />
+            </div>
+            <div>
+              <label>NFE steps</label>
+              <input id="nfe_step" type="number" min="4" max="64" step="2" value="32" />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label>Cross-fade (s)</label>
+              <input id="cross_fade_duration" type="number" min="0" max="1" step="0.01" value="0.15" />
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <label style="display:flex;align-items:center;gap:8px;margin:0;color:var(--text)">
+                <input id="remove_silence" type="checkbox" />
+                Remove silences
+              </label>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn-primary" id="btnInfer" type="button">Synthesize</button>
+          </div>
+          <div class="progress-bar"><span id="progressFill"></span></div>
+          <div class="meta" id="progressText">Sẵn sàng</div>
+        </section>
+      </div>
+
+      <div>
+        <section class="card">
+          <h2>Output</h2>
+          <audio id="audioOut" class="out-audio" controls></audio>
+          <img id="specOut" class="spec" alt="Spectrogram" />
+          <div class="meta" id="outMeta">Chưa có kết quả</div>
+          <div class="actions">
+            <a id="btnDownload" class="btn-ghost" href="#" download
+              style="display:none;text-decoration:none;padding:10px 14px;border-radius:10px;border:1px solid var(--border)">Tải
+              WAV</a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const logEl = $("log");
+    let pollTimer = null;
+    const PRESET_KEY = "f5tts_ref_presets_v1";
+
+    function log(msg) {
+      const t = new Date().toLocaleTimeString();
+      logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent;
+    }
+
+    function loadPresets() {
+      try {
+        const raw = localStorage.getItem(PRESET_KEY);
+        if (!raw) return [];
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function savePresets(list) {
+      localStorage.setItem(PRESET_KEY, JSON.stringify(list));
+    }
+
+    function formatBytes(n) {
+      if (n < 1024) return n + " B";
+      if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+      return (n / (1024 * 1024)).toFixed(2) + " MB";
+    }
+
+    function refreshPresetSelect(selectedId) {
+      const sel = $("ref_preset");
+      const list = loadPresets();
+      const prev = selectedId || sel.value;
+      sel.innerHTML = "";
+      const empty = document.createElement("option");
+      empty.value = "";
+      empty.textContent = list.length ? "(chọn mẫu...)" : "(chưa có mẫu nào)";
+      sel.appendChild(empty);
+      for (const p of list) {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        const size = p.audio_data ? formatBytes(p.audio_data.length) : "?";
+        opt.textContent = `${p.name} · ${p.audio_name || "audio"} · ${size}`;
+        sel.appendChild(opt);
+      }
+      if (prev && [...sel.options].some((o) => o.value === prev)) {
+        sel.value = prev;
+      }
+      updatePresetMeta();
+    }
+
+    function getSelectedPreset() {
+      const id = $("ref_preset").value;
+      if (!id) return null;
+      return loadPresets().find((p) => p.id === id) || null;
+    }
+
+    function updatePresetMeta() {
+      const p = getSelectedPreset();
+      const preview = $("ref_preset_preview");
+      const meta = $("ref_preset_meta");
+      if (!p) {
+        preview.style.display = "none";
+        preview.removeAttribute("src");
+        meta.textContent = "";
+        return;
+      }
+      preview.style.display = "block";
+      preview.src = p.audio_data;
+      const textPreview = (p.ref_text || "").trim() || "(không có ref text — dùng ASR)";
+      meta.textContent = `Text: ${textPreview}`;
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Không đọc được file audio"));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function dataUrlToFile(dataUrl, filename, mime) {
+      const [header, b64] = dataUrl.split(",");
+      const type = mime || (header.match(/data:([^;]+)/) || [])[1] || "application/octet-stream";
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new File([bytes], filename || "ref.wav", { type });
+    }
+
+    function setRefAudioFile(file) {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      $("ref_audio").files = dt.files;
+    }
+
+    async function applyPreset(preset) {
+      if (!preset) return;
+      $("ref_text").value = preset.ref_text || "";
+      const file = dataUrlToFile(
+        preset.audio_data,
+        preset.audio_name || "ref.wav",
+        preset.audio_type || "audio/wav"
+      );
+      setRefAudioFile(file);
+      $("ref_preset").value = preset.id;
+      updatePresetMeta();
+      log(`Đã nạp mẫu: ${preset.name}`);
+    }
+
+    $("ref_preset").addEventListener("change", async () => {
+      updatePresetMeta();
+      const p = getSelectedPreset();
+      if (!p) return;
+      try {
+        await applyPreset(p);
+        localStorage.setItem(PRESET_KEY + "_last", p.id);
+      } catch (e) {
+        alert("Không nạp được mẫu: " + e.message);
+      }
+    });
+
+    $("btnApplyPreset").onclick = async () => {
+      const p = getSelectedPreset();
+      if (!p) {
+        alert("Chọn một mẫu trước.");
+        return;
+      }
+      try {
+        await applyPreset(p);
+      } catch (e) {
+        alert("Không áp dụng được mẫu: " + e.message);
+      }
+    };
+
+    $("btnSavePreset").onclick = async () => {
+      const name = $("ref_preset_name").value.trim();
+      if (!name) {
+        alert("Nhập tên mẫu.");
+        return;
+      }
+      const file = $("ref_audio").files[0];
+      if (!file) {
+        alert("Chọn reference audio trước khi lưu mẫu.");
+        return;
+      }
+      if (file.size > 4 * 1024 * 1024) {
+        if (!confirm("File > 4MB, có thể không đủ chỗ localStorage. Vẫn lưu?")) return;
+      }
+      $("btnSavePreset").disabled = true;
+      try {
+        const audio_data = await fileToDataUrl(file);
+        const list = loadPresets();
+        const existing = list.findIndex((p) => p.name.toLowerCase() === name.toLowerCase());
+        const preset = {
+          id: existing >= 0 ? list[existing].id : ("p_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7)),
+          name,
+          ref_text: $("ref_text").value,
+          audio_name: file.name,
+          audio_type: file.type || "application/octet-stream",
+          audio_data,
+          saved_at: new Date().toISOString(),
+        };
+        if (existing >= 0) list[existing] = preset;
+        else list.push(preset);
+        savePresets(list);
+        localStorage.setItem(PRESET_KEY + "_last", preset.id);
+        $("ref_preset_name").value = "";
+        refreshPresetSelect(preset.id);
+        updatePresetMeta();
+        log(`Đã lưu mẫu "${name}" (${formatBytes(audio_data.length)})`);
+      } catch (e) {
+        const msg = /QuotaExceeded/i.test(String(e)) || e.name === "QuotaExceededError"
+          ? "localStorage đầy — xóa mẫu cũ hoặc dùng file nhỏ hơn."
+          : e.message;
+        alert("Lưu mẫu thất bại: " + msg);
+        log("Save preset failed: " + msg);
+      } finally {
+        $("btnSavePreset").disabled = false;
+      }
+    };
+
+    $("btnDeletePreset").onclick = () => {
+      const p = getSelectedPreset();
+      if (!p) {
+        alert("Chọn mẫu cần xóa.");
+        return;
+      }
+      if (!confirm(`Xóa mẫu "${p.name}"?`)) return;
+      const list = loadPresets().filter((x) => x.id !== p.id);
+      savePresets(list);
+      refreshPresetSelect("");
+      log(`Đã xóa mẫu: ${p.name}`);
+    };
+
+    function setDot(mode) {
+      const dot = $("statusDot");
+      dot.className = "dot" + (mode ? " " + mode : "");
+    }
+
+    async function api(path, options = {}) {
+      const res = await fetch(path, options);
+      let data = null;
+      try { data = await res.json(); } catch (_) { }
+      if (!res.ok) {
+        const detail = data && (data.detail || data.error) ? (data.detail || data.error) : res.statusText;
+        throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+      }
+      return data;
+    }
+
+    function fillSelect(selectEl, items, preferred) {
+      const prev = selectEl.value;
+      selectEl.innerHTML = "";
+      if (!items || !items.length) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "(không tìm thấy file trong model/)";
+        selectEl.appendChild(opt);
+        return;
+      }
+      for (const item of items) {
+        const opt = document.createElement("option");
+        opt.value = item.path;
+        opt.textContent = item.label || item.path;
+        selectEl.appendChild(opt);
+      }
+      const want = preferred || prev;
+      if (want && [...selectEl.options].some((o) => o.value === want)) {
+        selectEl.value = want;
+      }
+    }
+
+    function pickVocabForCkpt(ckptPath, vocabItems) {
+      if (!ckptPath || !vocabItems || !vocabItems.length) return "";
+      const dir = ckptPath.replace(/\\/g, "/").split("/").slice(0, -1).join("/");
+      const sameDir = vocabItems.filter((v) => {
+        const vdir = v.path.replace(/\\/g, "/").split("/").slice(0, -1).join("/");
+        return vdir === dir;
+      });
+      const prefer = sameDir.find((v) => /vocab\.txt$/i.test(v.path))
+        || sameDir.find((v) => /vocab/i.test(v.name || v.path))
+        || sameDir[0];
+      return prefer ? prefer.path : "";
+    }
+
+    async function loadModelOptions(preferred = {}) {
+      const data = await api("/api/models");
+      fillSelect($("ckpt_file"), data.ckpt_files, preferred.ckpt_file || data.defaults.ckpt_file);
+      fillSelect($("vocab_file"), data.vocab_files, preferred.vocab_file || data.defaults.vocab_file);
+      const nCkpt = (data.ckpt_files || []).length;
+      const nVocab = (data.vocab_files || []).length;
+      $("modelScanHint").textContent =
+        `Đã quét ${data.model_dir}: ${nCkpt} ckpt, ${nVocab} vocab. Thêm file vào model/ rồi bấm Quét model/.`;
+      return data;
+    }
+
+    async function refreshStatus() {
+      try {
+        const s = await api("/api/status");
+        fillSelect($("ckpt_file"), s.ckpt_files, $("ckpt_file").value || s.defaults.ckpt_file);
+        fillSelect($("vocab_file"), s.vocab_files, $("vocab_file").value || s.defaults.vocab_file);
+
+        const di = s.device_info || {};
+        const gpuBit = di.gpu_name
+          ? `${di.gpu_name}${di.gpu_memory_gb ? ` (${di.gpu_memory_gb}GB)` : ""}`
+          : (s.device || di.device || "?");
+        if (s.loading) {
+          setDot("busy");
+          $("statusText").textContent = "Đang load model...";
+        } else if (s.loaded) {
+          setDot("on");
+          $("statusText").textContent = `Ready · ${s.device} · ${gpuBit} · ${s.model_name}`;
+        } else if (s.error) {
+          setDot("err");
+          $("statusText").textContent = "Lỗi: " + s.error;
+        } else {
+          setDot("");
+          const cudaHint = di.cuda_available ? `CUDA OK · ${gpuBit}` : `device=${s.device || di.device}`;
+          $("statusText").textContent = `Chưa chạy service · ${cudaHint}`;
+        }
+
+        const p = s.progress || {};
+        if (p.total > 0) {
+          const pct = Math.round((p.current / p.total) * 100);
+          $("progressFill").style.width = pct + "%";
+        } else if (p.status === "loading") {
+          $("progressFill").style.width = "35%";
+        } else if (p.status === "done") {
+          $("progressFill").style.width = "100%";
+        }
+        if (p.message) $("progressText").textContent = p.message;
+        return s;
+      } catch (e) {
+        setDot("err");
+        $("statusText").textContent = e.message;
+      }
+    }
+
+    function startPolling() {
+      stopPolling();
+      pollTimer = setInterval(refreshStatus, 1200);
+    }
+    function stopPolling() {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = null;
+    }
+
+    $("btnRefresh").onclick = () => refreshStatus();
+    $("btnScanModels").onclick = async () => {
+      try {
+        const data = await loadModelOptions({
+          ckpt_file: $("ckpt_file").value,
+          vocab_file: $("vocab_file").value,
+        });
+        log(`Scanned model/: ${data.ckpt_files.length} ckpt, ${data.vocab_files.length} vocab`);
+      } catch (e) {
+        log("Scan failed: " + e.message);
+      }
+    };
+
+    $("ckpt_file").addEventListener("change", async () => {
+      try {
+        const data = await api("/api/models");
+        const autoVocab = pickVocabForCkpt($("ckpt_file").value, data.vocab_files);
+        if (autoVocab) $("vocab_file").value = autoVocab;
+      } catch (_) { }
+    });
+
+    $("btnStart").onclick = async () => {
+      $("btnStart").disabled = true;
+      log("Starting service...");
+      startPolling();
+      try {
+        const body = {
+          model_name: $("model_name").value.trim() || "F5TTS_Base",
+          ckpt_file: $("ckpt_file").value.trim(),
+          vocab_file: $("vocab_file").value.trim(),
+          vocoder_name: $("vocoder_name").value,
+        };
+        const s = await api("/api/service/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        log(s.message || "Service started");
+        await refreshStatus();
+      } catch (e) {
+        log("Start failed: " + e.message);
+        setDot("err");
+      } finally {
+        $("btnStart").disabled = false;
+      }
+    };
+
+    $("btnStop").onclick = async () => {
+      try {
+        const s = await api("/api/service/stop", { method: "POST" });
+        log(s.message || "Stopped");
+        await refreshStatus();
+      } catch (e) {
+        log("Stop failed: " + e.message);
+      }
+    };
+
+    $("btnInfer").onclick = async () => {
+      const file = $("ref_audio").files[0];
+      if (!file) {
+        alert("Chọn reference audio trước.");
+        return;
+      }
+      const genText = $("gen_text").value.trim();
+      if (!genText) {
+        alert("Nhập gen_text.");
+        return;
+      }
+
+      $("btnInfer").disabled = true;
+      $("progressFill").style.width = "5%";
+      $("progressText").textContent = "Đang gửi request...";
+      startPolling();
+      log("Synthesize started");
+
+      try {
+        const fd = new FormData();
+        fd.append("ref_audio", file);
+        fd.append("ref_text", $("ref_text").value);
+        fd.append("gen_text", genText);
+        fd.append("speed", $("speed").value);
+        fd.append("pause_sec", $("pause_sec").value);
+        fd.append("nfe_step", $("nfe_step").value);
+        fd.append("cross_fade_duration", $("cross_fade_duration").value);
+        fd.append("remove_silence", $("remove_silence").checked ? "true" : "false");
+        fd.append("ckpt_file", $("ckpt_file").value.trim());
+        fd.append("vocab_file", $("vocab_file").value.trim());
+        fd.append("model_name", $("model_name").value.trim() || "F5TTS_Base");
+        fd.append("vocoder_name", $("vocoder_name").value);
+
+        const res = await api("/api/infer", { method: "POST", body: fd });
+        $("audioOut").src = res.audio_url + "?t=" + Date.now();
+        $("audioOut").load();
+        if (res.spectrogram_url) {
+          $("specOut").style.display = "block";
+          $("specOut").src = res.spectrogram_url + "?t=" + Date.now();
+        } else {
+          $("specOut").style.display = "none";
+        }
+        $("btnDownload").style.display = "inline-block";
+        $("btnDownload").href = res.download_url;
+        $("outMeta").textContent =
+          `${res.chunks} chunk · ${res.duration_sec.toFixed(2)}s · ${res.sample_rate} Hz` +
+          (res.ref_text ? ` · ref: ${res.ref_text}` : "");
+        $("progressFill").style.width = "100%";
+        $("progressText").textContent = "Hoàn tất";
+        log("Done: " + res.audio_url);
+      } catch (e) {
+        log("Infer failed: " + e.message);
+        $("progressText").textContent = "Lỗi: " + e.message;
+        setDot("err");
+      } finally {
+        $("btnInfer").disabled = false;
+        await refreshStatus();
+      }
+    };
+
+    // Sample text matching README/CLI example
+    $("gen_text").value =
+      "mình muốn ra nước ngoài để tiếp xúc nhiều công ty lớn\n" +
+      "sau đó mang những gì học được về việt nam giúp xây dựng các công trình tốt hơn";
+    $("ref_text").value = "cả hai bên hãy cố gắng hiểu cho nhau";
+
+    refreshPresetSelect(localStorage.getItem(PRESET_KEY + "_last") || "");
+    const lastPreset = getSelectedPreset();
+    if (lastPreset) {
+      applyPreset(lastPreset).catch(() => { });
+    }
+
+    loadModelOptions().then(() => refreshStatus()).catch((e) => {
+      setDot("err");
+      $("statusText").textContent = e.message;
+    });
+  </script>
+</body>
+
+</html>
